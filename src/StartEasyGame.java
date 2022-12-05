@@ -1,7 +1,6 @@
 class StartEasyGame extends NewGame {
 
     private boolean playerMadeAMove;
-    private static final int EASY_GAME = 1;
 
     StartEasyGame() {
         super();
