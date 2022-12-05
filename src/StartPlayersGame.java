@@ -2,12 +2,19 @@ class StartPlayersGame extends NewGame {
     boolean ifPlayer1CanMove;
     boolean ifPlayer2CanMove;
 
+    /**
+     * Class constructor
+     * Sets the players modes, if it is possible to go
+     */
     StartPlayersGame() {
         super();
         ifPlayer1CanMove = true;
         ifPlayer2CanMove = true;
     }
 
+    /**
+     * New game begins
+     */
     void game() {
         while (flag) {
             makeMoves();
@@ -15,6 +22,9 @@ class StartPlayersGame extends NewGame {
         ScoreCounter.showResultScores();
     }
 
+    /**
+     * Two players do some moves until the game ends
+     */
     public void makeMoves() {
         if (board.flag) {
             board.showBoard();
@@ -28,8 +38,8 @@ class StartPlayersGame extends NewGame {
             System.out.println("No possible moves to you");
             ifPlayer1CanMove = false;
         }
-        board.calculatePossibleMoves(2, 1);
-        board.fillPossibleMoves();
+        board.countPossibleMoves(2, 1);
+        board.changePossibleMoves();
         if (board.flag) {
             board.showBoard();
             playerMoves(2);
@@ -43,7 +53,7 @@ class StartPlayersGame extends NewGame {
                 ifPlayer2CanMove = false;
             }
         }
-        board.calculatePossibleMoves(1, 2);
-        board.fillPossibleMoves();
+        board.countPossibleMoves(1, 2);
+        board.changePossibleMoves();
     }
 }

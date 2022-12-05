@@ -1,22 +1,22 @@
 class ScoreCounter {
 
-    static int currentPlayer1Score = 0;
-    static int currentPlayer2Score = 0;
+    static int firstPlayerScore = 0;
+    static int secondPlayerScore = 0;
     private static int bestPlayerScore = 0;
 
     static void showScores() {
-        System.out.println("Player 'x' scores: " + currentPlayer1Score
-                + "\nPlayer 'o' scores: " + currentPlayer2Score + "\n");
+        System.out.println("Player 'x' scores: " + firstPlayerScore
+                + "\nPlayer 'o' scores: " + secondPlayerScore + "\n");
     }
 
     static void showResultScores() {
         saveBestScoreOfPlayer1();
-        if (currentPlayer1Score > currentPlayer2Score) {
-            System.out.printf("Player 'x' won by %d scores!", currentPlayer1Score - currentPlayer2Score);
+        if (firstPlayerScore > secondPlayerScore) {
+            System.out.printf("Player 'x' won by %d scores!", firstPlayerScore - secondPlayerScore);
             saveBestScoreOfPlayer1();
             System.out.print("\n\n\n");
-        } else if (currentPlayer1Score < currentPlayer2Score) {
-            System.out.printf("Player 'o' won by %d scores!", currentPlayer2Score - currentPlayer1Score);
+        } else if (firstPlayerScore < secondPlayerScore) {
+            System.out.printf("Player 'o' won by %d scores!", secondPlayerScore - firstPlayerScore);
             saveBestScoreOfPlayer1();
             System.out.print("\n\n\n");
         } else {
@@ -27,8 +27,8 @@ class ScoreCounter {
     }
 
     private static void saveBestScoreOfPlayer1() {
-        if (currentPlayer1Score > bestPlayerScore) {
-            bestPlayerScore = currentPlayer1Score;
+        if (firstPlayerScore > bestPlayerScore) {
+            bestPlayerScore = firstPlayerScore;
         }
     }
 

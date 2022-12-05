@@ -5,24 +5,30 @@ class Board {
 
     private int[][] board;
     private final List<Cell> possibleMoves;
-    private final List<List<Cell>> tilesToFlip;
+    private final List<List<Cell>> movesToFlip;
     public boolean flag;
 
+    final int SIZE = 8;
+
+    /**
+     * Class constructor.
+     * Sets the board with starting chips
+     */
     Board() {
         newBoard();
-        tilesToFlip = new ArrayList<>();
+        movesToFlip = new ArrayList<>();
         ArrayList<Cell> arr = new ArrayList<>();
         arr.add(new Cell(3, 3));
-        tilesToFlip.add(arr);
+        movesToFlip.add(arr);
         arr = new ArrayList<>();
         arr.add(new Cell(3, 3));
-        tilesToFlip.add(arr);
+        movesToFlip.add(arr);
         arr = new ArrayList<>();
         arr.add(new Cell(4, 4));
-        tilesToFlip.add(arr);
+        movesToFlip.add(arr);
         arr = new ArrayList<>();
         arr.add(new Cell(4, 4));
-        tilesToFlip.add(arr);
+        movesToFlip.add(arr);
         possibleMoves = new ArrayList<>();
         possibleMoves.add(new Cell(2, 3));
         possibleMoves.add(new Cell(3, 2));
@@ -43,22 +49,14 @@ class Board {
         board[5][4] = 3;
     }
 
-    void makeMove(int posX, int posY, int player) {
-        board[posX][posY] = player;
-        int i = 0;
-        while (possibleMoves.get(i).getX() != posX || possibleMoves.get(i).getY() != posY) {
-            i++;
-        }
-        for (Cell sl : tilesToFlip.get(i)) {
-            board[sl.getX()][sl.getY()] = player;
-        }
-    }
-
+    /**
+     * Creates the outlines and the row and column numbers of the board
+     */
     void showBoard() {
         System.out.println("       1    2    3    4    5    6    7    8");
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < SIZE; i++) {
             System.out.print("  " + (i + 1) + "  ");
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < SIZE; j++) {
                 if (board[i][j] == 0) {
                     System.out.print("[   ]");
                 } else if (board[i][j] == 1) {
@@ -72,82 +70,154 @@ class Board {
             System.out.print("\n");
         }
 
-        ScoreCounter.currentPlayer1Score = calculateTiles(1);
-        ScoreCounter.currentPlayer2Score = calculateTiles(2);
+        ScoreCounter.firstPlayerScore = countPossibleFlips(1);
+        ScoreCounter.secondPlayerScore = countPossibleFlips(2);
         ScoreCounter.showScores();
     }
 
-    void renewBoardAfterCompMove() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (board[i][j] == 3) {
-                    board[i][j] = 0;
-                }
-            }
+    /**
+     * Places a chip on the board for a player
+     *
+     * @param move - the player's move
+     * @param row - the row played
+     * @param column - the column played
+     */
+    void makeMove(int row, int column, int move) {
+        board[row][column] = move;
+        int i = 0;
+        while (possibleMoves.get(i).getRow() != row || possibleMoves.get(i).getColumn() != column) {
+            i++;
         }
-        tilesToFlip.clear();
-        possibleMoves.clear();
+        for (Cell cell : movesToFlip.get(i)) {
+            board[cell.getRow()][cell.getColumn()] = move;
+        }
     }
-
+    
+    /**
+     * Updates the board after player's move
+     */
     void renewBoardAfterPlayer1Move() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
                 if (board[i][j] == 3) {
                     board[i][j] = 0;
                 }
             }
         }
-        tilesToFlip.clear();
         possibleMoves.clear();
+        movesToFlip.clear();
+    }
+    
+    /**
+     * Calculates the computer's move based on the best one
+     */
+    void makeComputerMove() {
+        int bestId = evaluationFunction();
+        board[possibleMoves.get(bestId).getRow()][possibleMoves.get(bestId).getColumn()] = 2;
+        for (Cell sl : movesToFlip.get(bestId)) {
+            board[sl.getRow()][sl.getColumn()] = 2;
+        }
     }
 
-    void calculatePossibleMoves(int player1, int player2) {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (isValidMove(player1, player2, i, j)) {
+    /**
+     * Updates the board after computer's move
+     */
+    void renewBoardAfterCompMove() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (board[i][j] == 3) {
+                    board[i][j] = 0;
+                }
+            }
+        }
+        possibleMoves.clear();
+        movesToFlip.clear();
+    }
+    
+    /**
+     * Counts scores players can get
+     *
+     * @param firstPlayer - first player position
+     * @param secondPlayer - second player position
+     */
+    void countPossibleMoves(int firstPlayer, int secondPlayer) {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (isMoveFree(firstPlayer, secondPlayer, i, j)) {
                     possibleMoves.add(new Cell(i, j));
                 }
             }
         }
-        if (possibleMoves.isEmpty()) {
-            flag = false;
-        } else {
-            flag = true;
+        flag = !possibleMoves.isEmpty();
+    }
+
+    /**
+     * Calculates how many flips can player make
+     *
+     * @param move - chip mode(1, 2, 3)
+     */
+    int countPossibleFlips(int move) {
+        int count = 0;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (board[i][j] == move) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Fills color of chip
+     */
+    void changePossibleMoves() {
+        for (Cell cell : possibleMoves) {
+            board[cell.getRow()][cell.getColumn()] = 3;
         }
     }
 
-    boolean isValidMove(int player1, int player2, int row, int column) {
+    /**
+     * Checks if it is possible to move to the given cell
+     *
+     * @param player1 - first player chip's value(1,2,3)
+     * @param player2 - second player chip's value(1,2,3)
+     * @param row - current row move
+     * @param column - current column move
+     */
+    boolean isMoveFree(int player1, int player2, int row, int column) {
         ArrayList<Cell> tmp = new ArrayList<>();
-        if (board[row][column] != 0 || !posExists(row, column)) {
-            return false;
-        }
-        board[row][column] = player1;
-        int[][] directions = {{0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}};
-        int x, y;
-        for (int i = 0; i < directions.length; i++) {
-            x = row + directions[i][0];
-            y = column + directions[i][1];
-            if (!posExists(x, y)) {
-                continue;
-            }
-            while (board[x][y] == player2) {
-                x += directions[i][0];
-                y += directions[i][1];
-                if (!posExists(x, y)) {
-                    break;
+        if (board[row][column] == 0 && correctPosition(row, column)) {
+            board[row][column] = player1;
+            int[][] directions = {{0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}};
+            int newRow, newColumn;
+            for (int[] direction : directions) {
+                newRow = row + direction[0];
+                newColumn = column + direction[1];
+                if (!correctPosition(newRow, newColumn)) {
+                    continue;
                 }
-            }
-            if (!posExists(x, y)) {
-                continue;
-            }
-            if (board[x][y] == player1) {
-                while (true) {
-                    x -= directions[i][0];
-                    y -= directions[i][1];
-                    if (x == row && y == column) {
+                while (board[newRow][newColumn] == player2) {
+                    newRow += direction[0];
+                    newColumn += direction[1];
+                    if (!correctPosition(newRow, newColumn)) {
                         break;
                     }
-                    tmp.add(new Cell(x, y));
+                }
+                if (!correctPosition(newRow, newColumn)) {
+                    continue;
+                }
+                if (board[newRow][newColumn] == player1) {
+                    while (true) {
+                        newRow -= direction[0];
+                        newColumn -= direction[1];
+                        if (newRow == row && newColumn == column) {
+                            break;
+                        }
+                        tmp.add(new Cell(newRow, newColumn));
+                    }
+                } else {
+                    return false;
                 }
             }
         }
@@ -155,81 +225,59 @@ class Board {
         if (tmp.isEmpty()) {
             return false;
         }
-        tilesToFlip.add(tmp);
+        movesToFlip.add(tmp);
         return true;
     }
 
-    private boolean posExists(int x, int y) {
-        return (x >= 0 && x < 8 && y >= 0 && y < 8);
+    /**
+     * Checks if a move is in a board
+     */
+    private boolean correctPosition(int row, int column) {
+        return (row >= 0 && row < SIZE && column >= 0 && column < SIZE);
     }
 
-    void fillPossibleMoves() {
-        for (Cell sl : possibleMoves) {
-            board[sl.getX()][sl.getY()] = 3;
-        }
+    /**
+     * Checks if a token move is a possible move
+     */
+    boolean correctMove(int row, int column) {
+        return correctPosition(row, column) && board[row][column] == 3;
     }
 
-    boolean correctPos(int x, int y) {
-        if (!posExists(x, y) || board[x][y] != 3) {
-            return false;
-        } else {
-            return true;
-        }
+    /**
+     * Checks if a move is on the boarders
+     */
+    private boolean isEnd(int row, int column) {
+        return row == 0 || column == 0 || row == SIZE || column == SIZE;
     }
 
-    int calculateTiles(int player) {
-        int counter = 0;
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (board[i][j] == player) {
-                    counter++;
-                }
-            }
-        }
-        return counter;
-    }
-
-    private boolean isOnEdge(int x, int y) {
-        if (x == 0 || y == 0 || x == 8 || y == 8) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    void makeComputerMove() {
-        int bestId = calculateBestMove();
-        board[possibleMoves.get(bestId).getX()][possibleMoves.get(bestId).getY()] = 2;
-        for (Cell sl : tilesToFlip.get(bestId)) {
-            board[sl.getX()][sl.getY()] = 2;
-        }
-    }
-
-    int calculateBestMove() {
+    /**
+     * Calculates the best computer move based on evaluation function
+     */
+    int evaluationFunction() {
         int bestScore = 0;
-        int bestId = 0;
+        int bestMove = 0;
         for (int i = 0; i < possibleMoves.size(); i++) {
             int currentScore = 0;
-            for (int j = 0; j < tilesToFlip.get(i).size(); j++) {
-                if (isOnEdge(tilesToFlip.get(i).get(j).getX(), tilesToFlip.get(i).get(j).getY())) {
+            for (int j = 0; j < movesToFlip.get(i).size(); j++) {
+                if (isEnd(movesToFlip.get(i).get(j).getRow(), movesToFlip.get(i).get(j).getColumn())) {
                     currentScore += 2;
                 } else {
                     currentScore += 1;
                 }
             }
-            if (tilesToFlip.get(i).size() == 1) {
-                if (tilesToFlip.get(i).get(0).getX() == possibleMoves.get(i).getX() ||
-                        tilesToFlip.get(i).get(0).getY() == possibleMoves.get(i).getY()) {
+            if (movesToFlip.get(i).size() == 1) {
+                if (movesToFlip.get(i).get(0).getRow() == possibleMoves.get(i).getRow() ||
+                        movesToFlip.get(i).get(0).getColumn() == possibleMoves.get(i).getColumn()) {
                     currentScore += 0.4;
                 } else {
                     currentScore += 0.8;
                 }
             }
             if (currentScore > bestScore) {
-                bestId = i;
+                bestMove = i;
                 bestScore = currentScore;
             }
         }
-        return bestId;
+        return bestMove;
     }
 }

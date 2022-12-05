@@ -1,12 +1,19 @@
 class StartEasyGame extends NewGame {
 
-    private boolean playerMadeAMove;
+    private boolean playerMove;
 
+    /**
+     * Class constructor
+     * Sets the player mode, if it is possible to go
+     */
     StartEasyGame() {
         super();
-        playerMadeAMove = true;
+        playerMove = true;
     }
 
+    /**
+     * New game begins
+     */
     void game() {
         while (flag) {
             makeMoves();
@@ -14,30 +21,33 @@ class StartEasyGame extends NewGame {
         ScoreCounter.showResultScores();
     }
 
+    /**
+     * A player does some moves until the game ends
+     */
     public void makeMoves() {
         if (board.flag) {
             board.showBoard();
             playerMoves(1);
-            playerMadeAMove = true;
+            playerMove = true;
         } else {
-            if (!playerMadeAMove) {
+            if (!playerMove) {
                 flag = false;
                 return;
             }
             System.out.println("No possible moves to you");
-            playerMadeAMove = false;
+            playerMove = false;
         }
-        board.calculatePossibleMoves(2, 1);
+        board.countPossibleMoves(2, 1);
         if (board.flag) {
             computerMoves();
         } else {
-            if (!playerMadeAMove) {
+            if (!playerMove) {
                 flag = false;
                 return;
             }
         }
-        board.calculatePossibleMoves(1, 2);
-        board.fillPossibleMoves();
+        board.countPossibleMoves(1, 2);
+        board.changePossibleMoves();
     }
 
     void computerMoves() {
@@ -45,4 +55,3 @@ class StartEasyGame extends NewGame {
         board.renewBoardAfterCompMove();
     }
 }
-

@@ -13,32 +13,33 @@ abstract class NewGame {
 
     protected abstract void makeMoves();
 
-    protected void playerMoves(int playerType) {
-        int x = 0, y = 0;
-        boolean currentFlag = true;
-        Scanner input = new Scanner(System.in);
+    /**
+     * Interfaces a new game session
+     *
+     * @param mode - player/computer
+     */
+    protected void playerMoves(int mode) {
+        int row = 0, column = 0;
+        boolean flag;
+        Scanner scanner = new Scanner(System.in);
         do {
             try {
-                if (playerType == 1) {
+                if (mode == 1) {
                     System.out.println("Player 'x' please enter a move");
                 } else {
                     System.out.println("Player 'o' please enter a move");
                 }
-                System.out.println("Enter a row : ");
-                x = input.nextInt();
-                System.out.println("Enter a column : ");
-                y = input.nextInt();
-                if (!board.correctPos(x - 1, y - 1)) {
-                    currentFlag = false;
-                } else {
-                    currentFlag = true;
-                }
+                System.out.println("Please, enter a row : ");
+                row = scanner.nextInt();
+                System.out.println("Please, enter a column : ");
+                column = scanner.nextInt();
+                flag = board.correctMove(row - 1, column - 1);
             } catch (Exception e) {
-                currentFlag = false;
+                flag = false;
                 System.out.println("Wrong coordinates, try again");
             }
-        } while (!currentFlag);
-        board.makeMove(x - 1, y - 1, playerType);
+        } while (!flag);
+        board.makeMove(row - 1, column - 1, mode);
         board.renewBoardAfterPlayer1Move();
         board.showBoard();
     }
