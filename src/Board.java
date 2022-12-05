@@ -112,10 +112,10 @@ class Board {
      * Calculates the computer's move based on the best one
      */
     void makeComputerMove() {
-        int bestId = evaluationFunction();
-        board[possibleMoves.get(bestId).getRow()][possibleMoves.get(bestId).getColumn()] = 2;
-        for (Cell sl : movesToFlip.get(bestId)) {
-            board[sl.getRow()][sl.getColumn()] = 2;
+        int bestMove = evaluationFunction();
+        board[possibleMoves.get(bestMove).getRow()][possibleMoves.get(bestMove).getColumn()] = 2;
+        for (Cell cell : movesToFlip.get(bestMove)) {
+            board[cell.getRow()][cell.getColumn()] = 2;
         }
     }
 
@@ -187,37 +187,36 @@ class Board {
      */
     boolean isMoveFree(int player1, int player2, int row, int column) {
         ArrayList<Cell> tmp = new ArrayList<>();
-        if (board[row][column] == 0 && correctPosition(row, column)) {
-            board[row][column] = player1;
-            int[][] directions = {{0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}};
-            int newRow, newColumn;
-            for (int[] direction : directions) {
-                newRow = row + direction[0];
-                newColumn = column + direction[1];
+        if (board[row][column] != 0 || !correctPosition(row, column)) {
+            return false;
+        }
+        board[row][column] = player1;
+        int[][] directions = {{0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}};
+        int newRow, newColumn;
+        for (int[] direction : directions) {
+            newRow = row + direction[0];
+            newColumn = column + direction[1];
+            if (!correctPosition(newRow, newColumn)) {
+                continue;
+            }
+            while (board[newRow][newColumn] == player2) {
+                newRow += direction[0];
+                newColumn += direction[1];
                 if (!correctPosition(newRow, newColumn)) {
-                    continue;
+                    break;
                 }
-                while (board[newRow][newColumn] == player2) {
-                    newRow += direction[0];
-                    newColumn += direction[1];
-                    if (!correctPosition(newRow, newColumn)) {
+            }
+            if (!correctPosition(newRow, newColumn)) {
+                continue;
+            }
+            if (board[newRow][newColumn] == player1) {
+                while (true) {
+                    newRow -= direction[0];
+                    newColumn -= direction[1];
+                    if (newRow == row && newColumn == column) {
                         break;
                     }
-                }
-                if (!correctPosition(newRow, newColumn)) {
-                    continue;
-                }
-                if (board[newRow][newColumn] == player1) {
-                    while (true) {
-                        newRow -= direction[0];
-                        newColumn -= direction[1];
-                        if (newRow == row && newColumn == column) {
-                            break;
-                        }
-                        tmp.add(new Cell(newRow, newColumn));
-                    }
-                } else {
-                    return false;
+                    tmp.add(new Cell(newRow, newColumn));
                 }
             }
         }

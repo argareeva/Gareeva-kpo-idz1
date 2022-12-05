@@ -35,8 +35,8 @@ abstract class NewGame {
                 column = scanner.nextInt();
                 flag = board.correctMove(row - 1, column - 1);
             } catch (Exception e) {
-                flag = false;
                 System.out.println("Wrong coordinates, try again");
+                break;
             }
         } while (!flag);
         board.makeMove(row - 1, column - 1, mode);
