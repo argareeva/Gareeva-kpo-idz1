@@ -52,6 +52,6 @@ class StartEasyGame extends NewGame {
 
     void computerMoves() {
         board.makeComputerMove();
-        board.renewBoardAfterCompMove();
+        board.renewBoard();
     }
 }

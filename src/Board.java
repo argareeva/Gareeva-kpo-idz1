@@ -92,22 +92,7 @@ class Board {
             board[cell.getRow()][cell.getColumn()] = move;
         }
     }
-    
-    /**
-     * Updates the board after player's move
-     */
-    void renewBoardAfterPlayer1Move() {
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (board[i][j] == 3) {
-                    board[i][j] = 0;
-                }
-            }
-        }
-        possibleMoves.clear();
-        movesToFlip.clear();
-    }
-    
+
     /**
      * Calculates the computer's move based on the best one
      */
@@ -120,9 +105,9 @@ class Board {
     }
 
     /**
-     * Updates the board after computer's move
+     * Updates the board after a  move
      */
-    void renewBoardAfterCompMove() {
+    void renewBoard() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (board[i][j] == 3) {
@@ -133,6 +118,7 @@ class Board {
         possibleMoves.clear();
         movesToFlip.clear();
     }
+
     
     /**
      * Counts scores players can get

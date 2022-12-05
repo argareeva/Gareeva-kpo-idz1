@@ -40,7 +40,7 @@ abstract class NewGame {
             }
         } while (!flag);
         board.makeMove(row - 1, column - 1, mode);
-        board.renewBoardAfterPlayer1Move();
+        board.renewBoard();
         board.showBoard();
     }
 }
